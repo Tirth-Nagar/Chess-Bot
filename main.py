@@ -1,0 +1,81 @@
+import cv2
+import numpy as np
+import pyautogui as pag
+import pygetwindow as gw
+
+def find_chessboard(image):
+    # Convert the image to grayscale
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+    # Apply Gaussian blur to reduce noise
+    blurred = cv2.GaussianBlur(gray_image, (5, 5), 0)
+
+    # Perform Canny edge detection
+    edges = cv2.Canny(blurred, 50, 150)
+
+    # Find contours in the edge image
+    contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    # Find the contour with the largest area
+    largest_contour = max(contours, key=cv2.contourArea)
+
+    # Approximate the contour to a polygon
+    epsilon = 0.1 * cv2.arcLength(largest_contour, True)
+    approx_polygon = cv2.approxPolyDP(largest_contour, epsilon, True)
+
+    # Ensure the polygon has four corners
+    if len(approx_polygon) == 4:
+        # Order the corners clockwise starting from the top-left
+        chessboard_corners = np.array([approx_polygon[0][0], approx_polygon[1][0], approx_polygon[2][0], approx_polygon[3][0]], dtype=np.float32)
+        ordered_corners = np.zeros((4, 2), dtype=np.float32)
+
+        sums = chessboard_corners.sum(axis=1)
+        diffs = np.diff(chessboard_corners, axis=1)
+
+        ordered_corners[0] = chessboard_corners[np.argmin(sums)]
+        ordered_corners[1] = chessboard_corners[np.argmin(diffs)]
+        ordered_corners[2] = chessboard_corners[np.argmax(sums)]
+        ordered_corners[3] = chessboard_corners[np.argmax(diffs)]
+
+        return ordered_corners
+
+    return None
+
+# Get window by title
+window_title = 'Play Chess Online for FREE with Friends - Chess.com'
+window = gw.getWindowsWithTitle(window_title)[0]
+
+# Put the window in focus
+window.activate()
+
+# Get the position and size of the window
+x, y, width, height = window.left, window.top, window.width, window.height
+
+# Take a screenshot of the window
+screenshot = pag.screenshot(region=(x, y, width, height))
+
+# Save the screenshot
+screenshot.save('screenshot.png')
+
+# Load the screenshot image
+screenshot = cv2.imread('screenshot.png')
+
+# Find the chessboard in the screenshot
+chessboard_corners = find_chessboard(screenshot)
+
+if chessboard_corners is not None:
+    # Perform perspective transformation to obtain a top-down view of the chessboard
+    width, height = 600, 600  # Set the desired output size of the chessboard
+    destination_corners = np.array([[0, 0], [width - 1, 0], [width - 1, height - 1], [0, height - 1]], dtype=np.float32)
+    transformation_matrix = cv2.getPerspectiveTransform(chessboard_corners, destination_corners)
+    transformed_chessboard = cv2.warpPerspective(screenshot, transformation_matrix, (width, height))
+
+    # Display the transformed chessboard
+    cv2.imshow('Transformed Chessboard', transformed_chessboard)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+    # Save the transformed chessboard
+    cv2.imwrite('transformed_chessboard.png', transformed_chessboard)
+else:
+    print('Chessboard not found in the screenshot.')
