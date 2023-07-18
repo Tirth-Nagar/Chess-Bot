@@ -1,3 +1,4 @@
+import os
 import cv2
 import numpy as np
 import pyautogui as pag
@@ -41,6 +42,32 @@ def find_chessboard(image):
 
     return None
 
+def split_chessboard(chessboard):
+
+    position_height = chessboard.shape[0] // 8
+    position_width = chessboard.shape[1] // 8
+    
+    rows = 8
+    cols = 8
+    
+    output_folder = 'positions'
+    os.makedirs(output_folder, exist_ok=True)
+
+    for row in range(rows):
+        for col in range(cols):
+            y_start = row * position_height
+            y_end = (row + 1) * position_height
+            
+            x_start = col * position_width
+            x_end = (col + 1) * position_width
+            
+            position_img = chessboard[y_start:y_end, x_start:x_end]
+            
+            output_filename = os.path.join(output_folder, f'{row}{col}.png')
+            
+            cv2.imwrite(output_filename, position_img)
+            
+            
 # Get window by title
 window_title = 'Play Chess Online for FREE with Friends - Chess.com'
 window = gw.getWindowsWithTitle(window_title)[0]
@@ -65,11 +92,13 @@ chessboard_corners = find_chessboard(screenshot)
 
 if chessboard_corners is not None:
     # Perform perspective transformation to obtain a top-down view of the chessboard
-    width, height = 600, 600  # Set the desired output size of the chessboard
+    width, height = 800, 800  # Set the desired output size of the chessboard
     destination_corners = np.array([[0, 0], [width - 1, 0], [width - 1, height - 1], [0, height - 1]], dtype=np.float32)
     transformation_matrix = cv2.getPerspectiveTransform(chessboard_corners, destination_corners)
     transformed_chessboard = cv2.warpPerspective(screenshot, transformation_matrix, (width, height))
 
+    split_chessboard(transformed_chessboard)
+    
     # Display the transformed chessboard
     cv2.imshow('Transformed Chessboard', transformed_chessboard)
     cv2.waitKey(0)
