@@ -43,14 +43,14 @@ def find_chessboard(image):
     return None
 
 def split_chessboard(chessboard):
-
-    position_height = chessboard.shape[0] // 8
-    position_width = chessboard.shape[1] // 8
     
     rows = 8
     cols = 8
+
+    position_height = chessboard.shape[0] // rows
+    position_width = chessboard.shape[1] // cols
     
-    output_folder = 'positions'
+    output_folder = 'current_positions'
     os.makedirs(output_folder, exist_ok=True)
 
     for row in range(rows):
