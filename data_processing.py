@@ -20,7 +20,12 @@ def fen_to_matrix(fen_str):
             col += int(char)
         else:
             # Non-empty square, place the piece on the board
-            board[row][col] = char
+            
+            if char.isupper():
+                # White piece
+                board[row][col] = "w"+char
+            else:
+                board[row][col] = char
             col += 1
 
     return np.array(board)
@@ -51,10 +56,32 @@ def split_chessboard(chessboard_img, fen_matrix):
             output_filename = os.path.join(output_path, f'{str(uuid.uuid4())}.png')
             
             cv2.imwrite(output_filename, position_img)
-            
-            
-chessboard_img = cv2.imread("dataset/test/1b1B1Qr1-7p-6r1-2P5-4Rk2-1K6-4B3-8.jpeg")
-fen_str = "1b1B1Qr1-7p-6r1-2P5-4Rk2-1K6-4B3-8"
 
-fen_matrix = fen_to_matrix(fen_str)
-split_chessboard(chessboard_img, fen_matrix)
+def get_x_files(folder_path, x):
+    # Initialize an empty list to store the filenames
+    file_list = []
+
+    # Get the list of all files in the folder
+    all_files = os.listdir(folder_path)
+
+    # Iterate through each file and add it to the list, up to the specified number (x)
+    count = 0
+    for file in all_files:
+        if count < x:
+            file_list.append(file)
+            count += 1
+        else:
+            break
+
+    return file_list 
+
+
+input_path = "dataset/test/"
+file_list = get_x_files(input_path, 1000)
+# print(file_list) 
+
+for file in file_list:
+    chessboard_img = cv2.imread(input_path+file)
+    fen_str = file.split(".")[0]
+    fen_matrix = fen_to_matrix(fen_str)
+    split_chessboard(chessboard_img, fen_matrix)
