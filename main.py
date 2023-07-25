@@ -1,6 +1,7 @@
 import os
 import cv2
 import numpy as np
+from keras.models import load_model
 import pyautogui as pag
 import pygetwindow as gw
 
@@ -67,44 +68,92 @@ def split_chessboard(chessboard):
             
             cv2.imwrite(output_filename, position_img)
             
-            
-# Get window by title
-window_title = 'Play Chess Online for FREE with Friends - Chess.com'
-window = gw.getWindowsWithTitle(window_title)[0]
+def get_screenshot():         
+    # Get window by title
+    window_title = 'Play Chess Online for FREE with Friends - Chess.com'
+    window = gw.getWindowsWithTitle(window_title)[0]
 
-# Put the window in focus
-window.activate()
+    # Put the window in focus
+    window.activate()
 
-# Get the position and size of the window
-x, y, width, height = window.left, window.top, window.width, window.height
+    # Get the position and size of the window
+    x, y, width, height = window.left, window.top, window.width, window.height
 
-# Take a screenshot of the window
-screenshot = pag.screenshot(region=(x, y, width, height))
+    # Take a screenshot of the window
+    screenshot = pag.screenshot(region=(x, y, width, height))
 
-# Save the screenshot
-screenshot.save('screenshot.png')
+    # Save the screenshot
+    screenshot.save('screenshot.png')
 
-# Load the screenshot image
-screenshot = cv2.imread('screenshot.png')
+    # Load the screenshot image
+    screenshot = cv2.imread('screenshot.png')
 
-# Find the chessboard in the screenshot
-chessboard_corners = find_chessboard(screenshot)
+    # Find the chessboard in the screenshot
+    chessboard_corners = find_chessboard(screenshot)
 
-if chessboard_corners is not None:
-    # Perform perspective transformation to obtain a top-down view of the chessboard
-    width, height = 800, 800  # Set the desired output size of the chessboard
-    destination_corners = np.array([[0, 0], [width - 1, 0], [width - 1, height - 1], [0, height - 1]], dtype=np.float32)
-    transformation_matrix = cv2.getPerspectiveTransform(chessboard_corners, destination_corners)
-    transformed_chessboard = cv2.warpPerspective(screenshot, transformation_matrix, (width, height))
+    if chessboard_corners is not None:
+        # Perform perspective transformation to obtain a top-down view of the chessboard
+        width, height = 400, 400  # Set the desired output size of the chessboard
+        destination_corners = np.array([[0, 0], [width - 1, 0], [width - 1, height - 1], [0, height - 1]], dtype=np.float32)
+        transformation_matrix = cv2.getPerspectiveTransform(chessboard_corners, destination_corners)
+        transformed_chessboard = cv2.warpPerspective(screenshot, transformation_matrix, (width, height))
 
-    split_chessboard(transformed_chessboard)
-    
-    # Display the transformed chessboard
-    cv2.imshow('Transformed Chessboard', transformed_chessboard)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+        split_chessboard(transformed_chessboard)
 
-    # Save the transformed chessboard
-    cv2.imwrite('transformed_chessboard.png', transformed_chessboard)
-else:
-    print('Chessboard not found in the screenshot.')
+    else:
+        print('Chessboard not found in the screenshot.')
+
+
+def predict_piece(image_path):
+    # Load the trained model
+    model = load_model('chess_piece_classifier.h5')  # Replace 'chess_piece_classifier.h5' with the actual path to your saved model
+
+    subfolders = ['b', 'E', 'k', 'n', 'p', 'q', 'r', 'wB', 'wK', 'wN', 'wP', 'wQ', 'wR']
+
+    # Preprocess the sample image
+    sample_img = cv2.imread(image_path)
+    sample_img = cv2.resize(sample_img, (50,50))
+    sample_img = np.expand_dims(sample_img, axis=0)
+    sample_img = sample_img / 255.0  # Normalize pixel values to [0, 1]
+
+    # Make the prediction using the model
+    predictions = model.predict(sample_img)
+
+    # Get the predicted class label
+    predicted_class_index = np.argmax(predictions)
+    predicted_class_label = subfolders[predicted_class_index]
+
+    return predicted_class_label.strip('w')
+
+def predict_board():
+    board = [['' for i in range(8)] for j in range(8)]
+    for i in range(8):
+        for j in range(8):
+            image_path = f'current_positions/{i}{j}.png'
+            board[i][j] = predict_piece(image_path)
+    return np.array(board)
+        
+def board_to_fen(board):
+    fen = ""
+    for row in board:
+        empty_count = 0
+        for square in row:
+            if square == 'E':
+                empty_count += 1
+            else:
+                if empty_count > 0:
+                    fen += str(empty_count)
+                    empty_count = 0
+                fen += square
+        if empty_count > 0:
+            fen += str(empty_count)
+        fen += '/'
+
+    # Remove the trailing slash at the end of the last row
+    fen = fen[:-1]
+
+    return fen
+
+
+# get_screenshot()
+print(board_to_fen(predict_board()))
