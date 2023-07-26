@@ -112,7 +112,6 @@ def predict_piece(image_path):
 
     # Preprocess the sample image
     sample_img = cv2.imread(image_path)
-    sample_img = cv2.resize(sample_img, (50,50))
     sample_img = np.expand_dims(sample_img, axis=0)
     sample_img = sample_img / 255.0  # Normalize pixel values to [0, 1]
 
@@ -158,10 +157,12 @@ stockfish = Stockfish(path="stockfish-windows-x86-64-avx2.exe")
 stockfish.update_engine_parameters({"Hash": 2048, "Threads": 2, "UCI_Elo": 3200})
 
 
-# get_screenshot()
-print(board_to_fen(predict_board()))
+get_screenshot()
 
 FEN_str = board_to_fen(predict_board())
 
 stockfish.set_fen_position(FEN_str)
 print(stockfish.get_best_move())
+print(stockfish.get_top_moves(3))
+
+print(stockfish.get_board_visual() )
