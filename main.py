@@ -4,6 +4,7 @@ import numpy as np
 from keras.models import load_model
 import pyautogui as pag
 import pygetwindow as gw
+from stockfish import Stockfish
 
 def find_chessboard(image):
     # Convert the image to grayscale
@@ -103,7 +104,6 @@ def get_screenshot():
     else:
         print('Chessboard not found in the screenshot.')
 
-
 def predict_piece(image_path):
     # Load the trained model
     model = load_model('chess_piece_classifier.h5')  # Replace 'chess_piece_classifier.h5' with the actual path to your saved model
@@ -154,6 +154,14 @@ def board_to_fen(board):
 
     return fen
 
+stockfish = Stockfish(path="stockfish-windows-x86-64-avx2.exe")
+stockfish.update_engine_parameters({"Hash": 2048, "Threads": 2, "UCI_Elo": 3200})
+
 
 # get_screenshot()
 print(board_to_fen(predict_board()))
+
+FEN_str = board_to_fen(predict_board())
+
+stockfish.set_fen_position(FEN_str)
+print(stockfish.get_best_move())
