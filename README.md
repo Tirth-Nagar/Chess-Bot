@@ -48,13 +48,12 @@ The model is compiled using the Adam optimizer and categorical cross-entropy los
 ## Getting Started
 
 1. Clone this repository to your local machine:
-
- *git clone https://github.com/your_username/chess-piece-classifier.git
- *cd chess-piece-classifier
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;git clone https://github.com/your_username/chess-piece-classifier.git
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cd chess-piece-classifier
 
 2. Install the required dependencies (ensure you have Python 3.x and pip installed):
 
- *pip install -r requirements.txt
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pip install -r requirements.txt
 
 3. Download the dataset and pre-process the data using the instructions located in the data_processing.py file
 4. Run the main.py file for the best move possible!
