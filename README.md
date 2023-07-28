@@ -1,8 +1,5 @@
 # Chess-Bot
- ChessBot is a project that focuses on developing a highly capable chess-playing bot designed specifically for playing on Chess.com. This project aims to leverage computer vision and the Stockfish Chess Engine to create an intelligent and strategic chess player that can compete against human opponents on the popular online chess platform.
-
-
-![Chess Piece Classifier](chess_piece_classifier.png)
+ Chess-Bot is a project that focuses on developing a highly capable chess-playing bot designed specifically for playing on Chess.com. This project aims to leverage computer vision and the Stockfish Chess Engine to create an intelligent and strategic chess player that can compete against human opponents on the popular online chess platform.
 
 ## Overview
 
@@ -10,9 +7,12 @@ The Chess Piece Classifier is a deep learning project that aims to classify imag
 
 ## Dataset
 
-The training dataset consists of images of chess pieces, each of size 50x50 pixels. The dataset is organized into subfolders for different classes:
+The training dataset consists of images of chessboards, each of size 400x400 pixels with each image file labelled as the associated FEN string. The dataset can be found [here](https://www.kaggle.com/datasets/koryakinp/chess-positions) for free.
 
-- Black Pieces:
+The associated data_processing.py file allows me to take and split each image into 64 images and sort them into folders according to the FEN string provided.
+
+- Black Pieces are stored in folders named:
+  - {Piece Type} (Folder Name) 
   - Black Bishop (b)
   - Black King (k)
   - Black Knight (n)
@@ -20,7 +20,8 @@ The training dataset consists of images of chess pieces, each of size 50x50 pixe
   - Black Queen (q)
   - Black Rook (r)
 
-- White Pieces (prefixed with 'w'):
+- White Pieces are stored in folders named:
+  - {Piece Type} (Folder Name)
   - White Bishop (wB)
   - White King (wK)
   - White Knight (wN)
@@ -51,11 +52,10 @@ The model is compiled using the Adam optimizer and categorical cross-entropy los
  git clone https://github.com/your_username/chess-piece-classifier.git
  cd chess-piece-classifier
 
-
 2. Install the required dependencies (ensure you have Python 3.x and pip installed):
 
  pip install -r requirements.txt
 
-3. Run the main.py file
-
+3. Download the dataset and pre-process the data using the instructions located in the data_processing.py file
+4. Run the main.py file for the best move possible!
 
