@@ -48,6 +48,7 @@ The model is compiled using the Adam optimizer and categorical cross-entropy los
 ## Getting Started
 
 1. Clone this repository to your local machine:
+   
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;git clone https://github.com/your_username/chess-piece-classifier.git
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cd chess-piece-classifier
 
