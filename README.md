@@ -1,9 +1,9 @@
 # Chess-Bot
- Chess-Bot is a project that focuses on developing a highly capable chess-playing bot designed specifically for playing on Chess.com. This project aims to leverage computer vision and the Stockfish Chess Engine to create an intelligent and strategic chess player that can compete against human opponents on the popular online chess platform.
+ Chess-Bot is a project that focuses on developing a highly capable chess-playing bot designed specifically for playing on Chess.com and similar sites. This project leverages computer vision and the Stockfish Chess Engine to create an intelligent and strategic chess player that can compete against human opponents on the popular online chess platforms.
 
 ## Overview
 
-The Chess Piece Classifier is a deep learning project that aims to classify images of chess pieces into different categories based on their type and color. The project uses a convolutional neural network (CNN) to achieve accurate and robust classification.
+The Chess Piece Classifier is a deep learning model that aims to classify images of chess pieces into different categories based on their type and color. The project uses a convolutional neural network (CNN) to achieve accurate and robust classification.
 
 ## Dataset
 
